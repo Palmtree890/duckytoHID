@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ducky Script to HID Converter</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         * {
             margin: 0;
@@ -42,6 +43,49 @@
             color: #d1d5db;
         }
 
+        .nav-menu {
+            background: #1f2937;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            background: #374151;
+            color: #d1d5db;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #4b5563;
+            border-color: #7c3aed;
+        }
+
+        .nav-button.active {
+            background: #7c3aed;
+            color: white;
+            border-color: #a855f7;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
         .prank-message {
             background: #fbbf24;
             color: #000;
@@ -56,11 +100,6 @@
 
         .prank-message.show {
             display: flex;
-        }
-
-        .prank-message svg {
-            flex-shrink: 0;
-            margin-top: 0.25rem;
         }
 
         @keyframes pulse {
@@ -215,12 +254,6 @@
             color: #a855f7;
             margin-bottom: 0.25rem;
         }
-
-        .icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-        }
     </style>
 </head>
 <body>
@@ -230,23 +263,31 @@
             <p>Convert Rubber Ducky scripts to HID format</p>
         </div>
 
-        <div id="prankMessage" class="prank-message">
-            <span style="font-size: 24px;">⚠️</span>
-            <div>
-                <p style="font-weight: bold;">Message from the Author:</p>
-                <p style="font-style: italic;">"Why would you even need this? Just write your HID scripts directly! But fine... here's your converter. You're welcome. 🙃"</p>
-            </div>
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <button class="nav-button active" onclick="switchPage('converter')">🦆 Ducky Converter</button>
+            <button class="nav-button" onclick="switchPage('base64')">🔐 Base64 Tools</button>
         </div>
 
-        <div class="grid">
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        📄 Ducky Script Input
-                    </div>
-                    <button class="btn-primary" onclick="handleImport()">Import File</button>
+        <!-- Converter Page -->
+        <div id="converterPage" class="page active">
+            <div id="prankMessage" class="prank-message">
+                <span style="font-size: 24px;">🙃</span>
+                <div>
+                    <p style="font-weight: bold;">Message from the Author:</p>
+                    <p style="font-style: italic;">"Why would you even need this? Just write your HID scripts directly! But fine... here's your converter. You're welcome. 🙃"</p>
                 </div>
-                <textarea id="duckyInput" placeholder="Enter Ducky Script here...
+            </div>
+
+            <div class="grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            📄 Ducky Script Input
+                        </div>
+                        <button class="btn-primary" onclick="handleImport()">Import File</button>
+                    </div>
+                    <textarea id="duckyInput" placeholder="Enter Ducky Script here...
 
 Example:
 REM Open Run dialog
@@ -256,115 +297,126 @@ STRING notepad
 ENTER
 DELAY 1000
 STRING Hello World!"></textarea>
-                <button class="btn-success" onclick="handleConvert()">Convert to HID</button>
+                    <button class="btn-success" onclick="handleConvert()">Convert to HID</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">HID Script Output</div>
+                        <div class="button-group">
+                            <button id="copyBtn" class="btn-blue" onclick="handleCopy()" disabled>
+                                📋 <span id="copyText">Copy</span>
+                            </button>
+                            <button id="downloadBtn" class="btn-blue" onclick="handleDownload()" disabled>
+                                💾 Download
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="hidOutput" class="output" readonly placeholder="Converted HID script will appear here..."></textarea>
+                </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">HID Script Output</div>
-                    <div class="button-group">
-                        <button id="copyBtn" class="btn-blue" onclick="handleCopy()" disabled>
-                            📋 <span id="copyText">Copy</span>
-                        </button>
-                        <button id="downloadBtn" class="btn-blue" onclick="handleDownload()" disabled>
-                            💾 Download
-                        </button>
+            <div class="info-panel">
+                <h3 class="info-title">Supported Commands</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-item-title">Basic:</div>
+                        <p>STRING, ENTER, DELAY</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Modifiers:</div>
+                        <p>GUI, CTRL, ALT, SHIFT</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Navigation:</div>
+                        <p>UP, DOWN, LEFT, RIGHT</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Special:</div>
+                        <p>F1-F12, ESC, TAB, HOME</p>
                     </div>
                 </div>
-                <textarea id="hidOutput" class="output" readonly placeholder="Converted HID script will appear here..."></textarea>
             </div>
         </div>
 
-        <div class="info-panel">
-            <h3 class="info-title">Supported Commands</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-item-title">Basic:</div>
-                    <p>STRING, ENTER, DELAY</p>
+        <!-- Base64 Page -->
+        <div id="base64Page" class="page">
+            <div class="grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            📝 Input Text
+                        </div>
+                    </div>
+                    <textarea id="base64Input" placeholder="Enter text to encode or Base64 to decode..."></textarea>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        <button class="btn-success" style="width: 50%;" onclick="handleBase64Encode()">⬆️ Encode to Base64</button>
+                        <button class="btn-success" style="width: 50%;" onclick="handleBase64Decode()">⬇️ Decode from Base64</button>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <div class="info-item-title">Modifiers:</div>
-                    <p>GUI, CTRL, ALT, SHIFT</p>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Result</div>
+                        <div class="button-group">
+                            <button id="base64CopyBtn" class="btn-blue" onclick="handleBase64Copy()" disabled>
+                                📋 <span id="base64CopyText">Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="base64Output" class="output" readonly placeholder="Result will appear here..."></textarea>
                 </div>
-                <div class="info-item">
-                    <div class="info-item-title">Navigation:</div>
-                    <p>UP, DOWN, LEFT, RIGHT</p>
-                </div>
-                <div class="info-item">
-                    <div class="info-item-title">Special:</div>
-                    <p>F1-F12, ESC, TAB, HOME</p>
+            </div>
+
+            <div class="info-panel">
+                <h3 class="info-title">Base64 Usage Guide</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-item-title">Encoding:</div>
+                        <p>Converts plain text to Base64 format. Useful for obfuscating payloads or encoding data.</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Decoding:</div>
+                        <p>Converts Base64 back to plain text. Useful for reading encoded data or captured logs.</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Use Cases:</div>
+                        <p>Encode HID scripts, obfuscate commands, decode network traffic, or process encoded payloads.</p>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-item-title">Pro Tip:</div>
+                        <p>Copy your HID output from the converter and encode it here for stealth delivery!</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Define keyMap and functions at the top level
-        const keyMap = {
-            'ENTER': '0x28',
-            'ESC': '0x29',
-            'ESCAPE': '0x29',
-            'BACKSPACE': '0x2A',
-            'TAB': '0x2B',
-            'SPACE': '0x2C',
-            'CAPSLOCK': '0x39',
-            'F1': '0x3A',
-            'F2': '0x3B',
-            'F3': '0x3C',
-            'F4': '0x3D',
-            'F5': '0x3E',
-            'F6': '0x3F',
-            'F7': '0x40',
-            'F8': '0x41',
-            'F9': '0x42',
-            'F10': '0x43',
-            'F11': '0x44',
-            'F12': '0x45',
-            'PRINTSCREEN': '0x46',
-            'SCROLLLOCK': '0x47',
-            'PAUSE': '0x48',
-            'INSERT': '0x49',
-            'HOME': '0x4A',
-            'PAGEUP': '0x4B',
-            'DELETE': '0x4C',
-            'END': '0x4D',
-            'PAGEDOWN': '0x4E',
-            'RIGHT': '0x4F',
-            'RIGHTARROW': '0x4F',
-            'LEFT': '0x50',
-            'LEFTARROW': '0x50',
-            'DOWN': '0x51',
-            'DOWNARROW': '0x51',
-            'UP': '0x52',
-            'UPARROW': '0x52',
-            'GUI': '0xE3',
-            'WINDOWS': '0xE3',
-            'CTRL': '0xE0',
-            'CONTROL': '0xE0',
-            'SHIFT': '0xE1',
-            'ALT': '0xE2',
-            'MENU': '0x76',
-            'APP': '0x65'
-        };
-
-        function charToHID(char) {
-            const code = char.charCodeAt(0);
-            if (code >= 97 && code <= 122) return `0x${(code - 93).toString(16).padStart(2, '0')}`;
-            if (code >= 65 && code <= 90) return `0x${(code - 61).toString(16).padStart(2, '0')}`;
-            if (code >= 49 && code <= 57) return `0x${(code - 19).toString(16).padStart(2, '0')}`;
-            if (code === 48) return '0x27';
+        // Page switching
+        function switchPage(pageName) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
             
-            const specialChars = {
-                ' ': '0x2C', '!': '0x1E', '@': '0x1F', '#': '0x20', '$': '0x21',
-                '%': '0x22', '^': '0x23', '&': '0x24', '*': '0x25', '(': '0x26',
-                ')': '0x27', '-': '0x2D', '_': '0x2D', '=': '0x2E', '+': '0x2E',
-                '[': '0x2F', '{': '0x2F', ']': '0x30', '}': '0x30', '\\': '0x31',
-                '|': '0x31', ';': '0x33', ':': '0x33', "'": '0x34', '"': '0x34',
-                ',': '0x36', '<': '0x36', '.': '0x37', '>': '0x37', '/': '0x38',
-                '?': '0x38', '`': '0x35', '~': '0x35'
-            };
+            // Remove active from all nav buttons
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
             
-            return specialChars[char] || '0x00';
+            // Show selected page
+            if (pageName === 'converter') {
+                const converterPage = document.getElementById('converterPage');
+                if (converterPage) converterPage.classList.add('active');
+                if (navButtons[0]) navButtons[0].classList.add('active');
+            } else if (pageName === 'base64') {
+                const base64Page = document.getElementById('base64Page');
+                if (base64Page) base64Page.classList.add('active');
+                if (navButtons[1]) navButtons[1].classList.add('active');
+            }
         }
 
         function convertDuckyToHID(ducky) {
@@ -520,6 +572,48 @@ STRING Hello World!"></textarea>
             a.download = 'hid_script.txt';
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        function handleBase64Encode() {
+            const input = document.getElementById('base64Input').value;
+            if (!input) {
+                alert('Please enter text to encode');
+                return;
+            }
+            try {
+                const encoded = btoa(input);
+                document.getElementById('base64Output').value = encoded;
+                document.getElementById('base64CopyBtn').disabled = false;
+            } catch (error) {
+                alert('Error encoding: ' + error.message);
+            }
+        }
+
+        function handleBase64Decode() {
+            const input = document.getElementById('base64Input').value;
+            if (!input) {
+                alert('Please enter Base64 to decode');
+                return;
+            }
+            try {
+                const decoded = atob(input);
+                document.getElementById('base64Output').value = decoded;
+                document.getElementById('base64CopyBtn').disabled = false;
+            } catch (error) {
+                alert('Error decoding: Invalid Base64 string');
+            }
+        }
+
+        function handleBase64Copy() {
+            const output = document.getElementById('base64Output');
+            output.select();
+            document.execCommand('copy');
+            
+            const copyText = document.getElementById('base64CopyText');
+            copyText.textContent = 'Copied!';
+            setTimeout(() => {
+                copyText.textContent = 'Copy';
+            }, 2000);
         }
     </script>
 </body>
